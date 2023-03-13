@@ -1,13 +1,11 @@
-import psycopg2
+from helpers import get_db_connection, get_logger
+from datetime import datetime
+
+logger = get_logger()
 
 # Establishing the connection
-conn = psycopg2.connect(
-    database="coinDB",
-    user="postgres",
-    password="sunnyside10",
-    host="127.0.0.1",
-    port="5432",
-)
+conn = get_db_connection()
+
 # Creating a cursor object using the cursor() method
 cursor = conn.cursor()
 
@@ -43,7 +41,7 @@ sql = """CREATE TABLE DATA(
     total_exchanges integer
     )"""
 cursor.execute(sql)
-print("Table created successfully........")
+logger.info(f"Table created successfully at {datetime.now()}")
 conn.commit()
 
 # Closing the connection
