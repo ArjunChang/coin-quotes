@@ -3,11 +3,12 @@ from psycopg2 import connect
 import json
 from requests import Session
 import logging
+from os import getenv
 
 
 def get_logger():
     logging.basicConfig(
-        filename="task_logs.log",
+        filename=getenv("LOG_FILE"),
         filemode="a",
         format="%(name)s - %(levelname)s - %(message)s",
     )
@@ -16,19 +17,13 @@ def get_logger():
     return logger
 
 
-def get_db_connection(
-    database: str = "coinDB",
-    user: str = "postgres",
-    password: str = "sunnyside10",
-    host: str = "127.0.0.1",
-    port: str = "5432",
-):
+def get_db_connection():
     conn = connect(
-        database=database,
-        user=user,
-        password=password,
-        host=host,
-        port=port,
+        database=getenv("POSTGRES_DB"),
+        user=getenv("POSTGRES_USER"),
+        password=getenv("POSTGRES_PASSWORD"),
+        host=getenv("POSTGRES_HOST"),
+        port=getenv("POSTGRES_PORT"),
     )
 
     return conn
@@ -37,7 +32,7 @@ def get_db_connection(
 def get_session() -> Session:
     headers = {
         "Accepts": "application/json",
-        "X-CMC_PRO_API_KEY": "9f4f9d88-3032-4457-9f7d-d4e597df7819",
+        "X-CMC_PRO_API_KEY": getenv("API_KEY"),
     }
 
     session = Session()
