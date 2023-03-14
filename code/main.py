@@ -10,6 +10,7 @@ from helpers import (
     insert_data,
     get_logger,
 )
+from setup import setup
 
 
 logger = get_logger()
@@ -24,6 +25,7 @@ def run_task():
         logger.info(f"Querying API at {datetime.now()}")
         response = session.get(url)
 
+        # Error handling
         if response.status_code != 200:
             raise RequestException(response)
 
@@ -46,4 +48,5 @@ def run_task():
 
 
 if __name__ == "__main__":
+    setup()
     run_task()
