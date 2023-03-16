@@ -11,11 +11,8 @@ def setup():
     # Creating a cursor object using the cursor() method
     cursor = conn.cursor()
 
-    # Doping EMPLOYEE table if already exists.
-    cursor.execute("DROP TABLE IF EXISTS DATA")
-
     # Creating table as per requirement
-    sql = """CREATE TABLE DATA(
+    sql = """CREATE TABLE IF NOT EXISTS DATA(
         data_id serial primary key,
         active_cryptocurrencies integer,
         active_exchanges integer,

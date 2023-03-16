@@ -6,8 +6,7 @@ services:
         container_name: task
         command: python3 code/main.py
         volumes:
-            - .:/usr/src/app/
-            - .:/usr/src/logs/
+            - logs:/app/logs
         environment:
             - LOG_FILE=logs/logs.log
             - POSTGRES_DB=coinDB
@@ -15,7 +14,8 @@ services:
             - POSTGRES_PASSWORD=coin123
             - POSTGRES_HOST=pgdb
             - POSTGRES_PORT=5432
-            - API_KEY=9f4f9d88-3032-4457-9f7d-d4e597df7819
+        env_file:
+            - env/task.env
         depends_on:
             - pgdb
     pgdb:
@@ -30,4 +30,5 @@ services:
         ports: 
             - '5432:5432'
 volumes:
+    logs:
     pgdata:
