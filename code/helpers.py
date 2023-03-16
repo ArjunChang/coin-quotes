@@ -2,19 +2,7 @@ from psycopg2._psycopg import connection
 from psycopg2 import connect
 import json
 from requests import Session
-import logging
 from os import getenv
-
-
-def get_logger():
-    logging.basicConfig(
-        filename=getenv("LOG_FILE"),
-        filemode="a",
-        format="%(name)s - %(levelname)s - %(message)s",
-    )
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-    return logger
 
 
 def get_db_connection():

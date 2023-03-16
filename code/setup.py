@@ -1,7 +1,7 @@
-from helpers import get_db_connection, get_logger
+from helpers import get_db_connection
+import logging
 from datetime import datetime
 
-logger = get_logger()
 
 
 def setup():
@@ -44,7 +44,7 @@ def setup():
     conn.commit()
 
     # Logging info
-    logger.info(f"Table created successfully at {datetime.now()}")
+    logging.info(f"Table created successfully at {datetime.now()}")
 
     # Closing the connection
     conn.close()

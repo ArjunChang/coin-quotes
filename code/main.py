@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime
 
 from requests.exceptions import RequestException
@@ -8,12 +9,8 @@ from helpers import (
     get_db_connection,
     get_session,
     insert_data,
-    get_logger,
 )
 from setup import setup
-
-
-logger = get_logger()
 
 
 def run_task():
@@ -22,7 +19,7 @@ def run_task():
     url = "https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
 
     try:
-        logger.info(f"Querying API at {datetime.now()}")
+        logging.info(f"Querying API at {datetime.now()}")
         response = session.get(url)
 
         # Error handling
@@ -37,14 +34,14 @@ def run_task():
         # Format data to suit the DB Schema
         formatted_data = format_response_data(data)
         insert_data(conn, **formatted_data)
-        logger.info(f"New entry inserted at {datetime.now()}")
+        logging.info(f"New entry inserted at {datetime.now()}")
 
         # Close DB connection
         conn.close()
 
     except RequestException as e:
         # Log the error
-        logger.error(e)
+        logging.error(e)
 
 
 if __name__ == "__main__":
