@@ -1,23 +1,30 @@
-from psycopg2._psycopg import connection
-from psycopg2 import connect
 import json
-from requests import Session
+import logging
+from datetime import datetime
 from os import getenv
+
+from psycopg2 import OperationalError, connect
+from psycopg2._psycopg import connection
+from requests import Session
 
 
 def get_db_connection():
-    conn = connect(
-        database=getenv("POSTGRES_DB"),
-        user=getenv("POSTGRES_USER"),
-        password=getenv("POSTGRES_PASSWORD"),
-        host=getenv("POSTGRES_HOST"),
-        port=getenv("POSTGRES_PORT"),
-    )
+    try:
+        conn = connect(
+            database=getenv("POSTGRES_DB"),
+            user=getenv("POSTGRES_USER"),
+            password=getenv("POSTGRES_PASSWORD"),
+            host=getenv("POSTGRES_HOST"),
+            port=getenv("POSTGRES_PORT"),
+        )
+
+    except OperationalError as e:
+        logging.error(e)
 
     return conn
 
 
-def get_session() -> Session:
+def get_quotes_session() -> Session:
     headers = {
         "Accepts": "application/json",
         "X-CMC_PRO_API_KEY": getenv("API_KEY"),
@@ -28,13 +35,26 @@ def get_session() -> Session:
     return session
 
 
-def format_response_data(data: dict) -> str:
+def format_quotes_response_data(data: dict) -> str:
     formated_data = data["data"]
     formated_data["quote"] = json.dumps(formated_data["quote"])
     return formated_data
 
 
-def insert_data(
+def insert_prices_data(conn: connection, data: list = []):
+    insert_statement = """INSERT INTO FUTURES_PRICE
+    (symbol, price, transaction_time) VALUES
+    """
+    for row in data:
+        date = datetime.fromtimestamp(row['time']/1000.0)
+        insert_statement += f" ('{row['symbol']}', {row['price']}, '{date}'),"
+
+    cursor = conn.cursor()
+    cursor.execute(insert_statement[:-1])
+    conn.commit()
+
+
+def insert_quotes_data(
     conn: connection,
     active_cryptocurrencies: int = None,
     active_exchanges: int = None,
@@ -68,7 +88,7 @@ def insert_data(
     cursor = conn.cursor()
     cursor.execute(
         """
-        INSERT INTO data
+        INSERT INTO QUOTES
         (active_cryptocurrencies, active_exchanges, active_market_pairs, btc_dominance,
         btc_dominance_24h_percentage_change, btc_dominance_yesterday, defi_24h_percentage_change,
         defi_market_cap, defi_volume_24h, defi_volume_24h_reported, derivatives_24h_percentage_change,

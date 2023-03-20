@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prices-cronjob
+spec:
+  schedule: "59 23 * * *"
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: prices-container
+            image: arjun25/coin-quotes:latest
+            command: ["python3", "/app/code/prices.py"]
+            env:
+            - name: POSTGRES_HOST
+              value: postgres
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: coinDB
+            - name: POSTGRES_USER
+              value: coinTask
+            - name: POSTGRES_PASSWORD
+              value: coin123
+          restartPolicy: OnFailure

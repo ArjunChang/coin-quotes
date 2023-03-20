@@ -3,3 +3,4 @@ requests==2.28.2
 sqlparse==0.4.3
 tzdata==2022.7
 urllib3==1.26.14
+sentry-sdk==1.17.0

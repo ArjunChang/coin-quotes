@@ -1,0 +1,4 @@
+.dockerignore
+*.yaml
+.venv/
+coin-quotes-helm/*

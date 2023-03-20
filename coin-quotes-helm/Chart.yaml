@@ -1,0 +1,4 @@
+apiVersion: v2
+name: coin-quotes-helm
+description: A chart for Coin Quotes
+version: 1.0.1

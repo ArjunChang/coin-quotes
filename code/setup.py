@@ -1,7 +1,7 @@
-from helpers import get_db_connection
 import logging
 from datetime import datetime
 
+from helpers import get_db_connection
 
 
 def setup():
@@ -12,7 +12,7 @@ def setup():
     cursor = conn.cursor()
 
     # Creating table as per requirement
-    sql = """CREATE TABLE IF NOT EXISTS DATA(
+    quotes_table = """CREATE TABLE IF NOT EXISTS QUOTES(
         data_id serial primary key,
         active_cryptocurrencies integer,
         active_exchanges integer,
@@ -39,12 +39,23 @@ def setup():
         total_cryptocurrencies integer,
         total_exchanges integer
         )"""
-    
-    cursor.execute(sql)
+
+    cursor.execute(quotes_table)
+
+    futures_price = """CREATE TABLE IF NOT EXISTS FUTURES_PRICE(
+        futures_price_id serial primary key,
+        symbol varchar(20),
+        price numeric(10,2),
+        transaction_time timestamp
+        )
+        """
+
+    cursor.execute(futures_price)
+
     conn.commit()
 
     # Logging info
-    logging.info(f"Table created successfully at {datetime.now()}")
+    logging.info(f"Tables created successfully at {datetime.now()}")
 
     # Closing the connection
     conn.close()

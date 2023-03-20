@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: quotes-cronjob
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: quotes-container
+            image: arjun25/coin-quotes:latest
+            command: ["python3", "/app/code/quotes.py"]
+            env:
+            - name: POSTGRES_HOST
+              value: postgres
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: coinDB
+            - name: POSTGRES_USER
+              value: coinTask
+            - name: POSTGRES_PASSWORD
+              value: coin123
+            - name: API_KEY
+              value: 9f4f9d88-3032-4457-9f7d-d4e597df7819
+          restartPolicy: OnFailure
