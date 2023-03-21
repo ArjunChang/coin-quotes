@@ -17,44 +17,48 @@ sentry_sdk.init(
 
 
 def run_task():
-    # Inititiate backoff time
+    # Inititiate backoff time and restart count
+    RESTART_COUNT = 1
     CURRENT_BACKOFF_TIME = 10
 
     # Setup the session
     session = get_quotes_session()
     url = "https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
 
-    try:
-        logging.info(f"Querying API at {datetime.now()}")
-        response = session.get(url)
+    while RESTART_COUNT <= 3:
+        try:
+            logging.info(f"Querying API at {datetime.now()}")
+            response = session.get(url)
 
-        # Error handling
-        if response.status_code != 200:
-            raise RequestException(response=response)
+            # Error handling
+            if response.status_code != 200:
+                raise RequestException(response=response)
 
-        data = json.loads(response.text)
+            data = json.loads(response.text)
 
-        # Connect to the DB
-        conn = get_db_connection()
+            # Connect to the DB
+            conn = get_db_connection()
 
-        # Format data to suit the DB Schema
-        formatted_data = format_quotes_response_data(data)
-        insert_quotes_data(conn, **formatted_data)
-        logging.info(f"New entry inserted at {datetime.now()}")
+            # Format data to suit the DB Schema
+            formatted_data = format_quotes_response_data(data)
+            insert_quotes_data(conn, **formatted_data)
+            logging.info(f"New entry inserted at {datetime.now()}")
 
-        # Close DB connection
-        conn.close()
+            # Close DB connection
+            conn.close()
 
-        # Reset backoff time
-        CURRENT_BACKOFF_TIME = 10
+            # Reset backoff time
+            CURRENT_BACKOFF_TIME = 10
 
-    except RequestException as e:
-        # Log the error
-        logging.error(e)
+        except RequestException as e:
+            RESTART_COUNT += 1
+            # Log the error when error is encountered thrice
+            if RESTART_COUNT == 3:
+                logging.error(e)
 
-        # Wait for a while and set backoff time
-        sleep(CURRENT_BACKOFF_TIME)
-        CURRENT_BACKOFF_TIME *= 2
+            # Wait for a while and set backoff time
+            sleep(CURRENT_BACKOFF_TIME)
+            CURRENT_BACKOFF_TIME *= 2
 
 
 if __name__ == "__main__":
