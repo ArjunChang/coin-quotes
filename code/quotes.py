@@ -47,8 +47,9 @@ def run_task():
             # Close DB connection
             conn.close()
 
-            # Reset backoff time
+            # Reset backoff time and exit loop
             CURRENT_BACKOFF_TIME = 10
+            break
 
         except RequestException as e:
             RESTART_COUNT += 1
