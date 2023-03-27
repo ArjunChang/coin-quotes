@@ -24,4 +24,5 @@ spec:
               value: coinTask
             - name: POSTGRES_PASSWORD
               value: coin123
+          imagePullPolicy: Always
           restartPolicy: OnFailure

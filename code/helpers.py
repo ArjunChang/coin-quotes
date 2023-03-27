@@ -17,11 +17,11 @@ def get_db_connection():
             host=getenv("POSTGRES_HOST"),
             port=getenv("POSTGRES_PORT"),
         )
+        
+        return conn
 
     except OperationalError as e:
         logging.error(e)
-
-    return conn
 
 
 def get_quotes_session() -> Session:
