@@ -3,8 +3,8 @@ import logging
 from datetime import datetime
 from time import sleep
 
-import sentry_sdk
 import helpers
+import sentry_sdk
 from requests.exceptions import RequestException
 from setup import setup
 
@@ -32,7 +32,6 @@ def run_task():
     formatted_data = helpers.format_quotes_response_data(data)
     helpers.insert_quotes_data(conn, **formatted_data)
     logging.info(f"New entry inserted at {datetime.now()}")
-    
 
 
 if __name__ == "__main__":
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     while RESTART_COUNT <= 3:
         try:
             run_task()
-            
+
             # Reset backoff time and exit loop
             CURRENT_BACKOFF_TIME = 10
             break

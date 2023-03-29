@@ -17,7 +17,7 @@ def get_db_connection():
             host=getenv("POSTGRES_HOST"),
             port=getenv("POSTGRES_PORT"),
         )
-        
+
         return conn
 
     except OperationalError as e:
@@ -53,6 +53,7 @@ def fetch_prices_response():
     url = "https://fapi.binance.com/fapi/v1/ticker/price"
     response = session.get(url)
     return response
+
 
 def insert_prices_data(conn: connection, data: list = []):
     insert_statement = """INSERT INTO DATA.FUTURES_PRICE
