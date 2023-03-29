@@ -4,8 +4,7 @@ from datetime import datetime
 from time import sleep
 
 import sentry_sdk
-from helpers import (format_quotes_response_data, get_db_connection,
-                     get_quotes_session, insert_quotes_data)
+import helpers
 from requests.exceptions import RequestException
 from setup import setup
 
@@ -17,36 +16,36 @@ sentry_sdk.init(
 
 
 def run_task():
+    logging.info(f"Querying API at {datetime.now()}")
+    response = helpers.fetch_quotes_response()
+
+    # Error handling
+    if response.status_code != 200:
+        raise RequestException(response=response)
+
+    data = json.loads(response.text)
+
+    # Connect to the DB
+    conn = helpers.get_db_connection()
+
+    # Format data to suit the DB Schema
+    formatted_data = helpers.format_quotes_response_data(data)
+    helpers.insert_quotes_data(conn, **formatted_data)
+    logging.info(f"New entry inserted at {datetime.now()}")
+    
+
+
+if __name__ == "__main__":
+    setup()
+
     # Inititiate backoff time and restart count
     RESTART_COUNT = 1
     CURRENT_BACKOFF_TIME = 10
 
-    # Setup the session
-    session = get_quotes_session()
-    url = "https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
-
     while RESTART_COUNT <= 3:
         try:
-            logging.info(f"Querying API at {datetime.now()}")
-            response = session.get(url)
-
-            # Error handling
-            if response.status_code != 200:
-                raise RequestException(response=response)
-
-            data = json.loads(response.text)
-
-            # Connect to the DB
-            conn = get_db_connection()
-
-            # Format data to suit the DB Schema
-            formatted_data = format_quotes_response_data(data)
-            insert_quotes_data(conn, **formatted_data)
-            logging.info(f"New entry inserted at {datetime.now()}")
-
-            # Close DB connection
-            conn.close()
-
+            run_task()
+            
             # Reset backoff time and exit loop
             CURRENT_BACKOFF_TIME = 10
             break
@@ -60,8 +59,3 @@ def run_task():
             # Wait for a while and set backoff time
             sleep(CURRENT_BACKOFF_TIME)
             CURRENT_BACKOFF_TIME *= 2
-
-
-if __name__ == "__main__":
-    setup()
-    run_task()

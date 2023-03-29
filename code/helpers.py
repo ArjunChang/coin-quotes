@@ -35,14 +35,27 @@ def get_quotes_session() -> Session:
     return session
 
 
+def fetch_quotes_response():
+    session = get_quotes_session()
+    url = "https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
+    response = session.get(url)
+    return response
+
+
 def format_quotes_response_data(data: dict) -> str:
     formated_data = data["data"]
     formated_data["quote"] = json.dumps(formated_data["quote"])
     return formated_data
 
 
+def fetch_prices_response():
+    session = Session()
+    url = "https://fapi.binance.com/fapi/v1/ticker/price"
+    response = session.get(url)
+    return response
+
 def insert_prices_data(conn: connection, data: list = []):
-    insert_statement = """INSERT INTO FUTURES_PRICE
+    insert_statement = """INSERT INTO DATA.FUTURES_PRICE
     (symbol, price, transaction_time) VALUES
     """
     for row in data:
@@ -88,7 +101,7 @@ def insert_quotes_data(
     cursor = conn.cursor()
     cursor.execute(
         """
-        INSERT INTO QUOTES
+        INSERT INTO DATA.QUOTES
         (active_cryptocurrencies, active_exchanges, active_market_pairs, btc_dominance,
         btc_dominance_24h_percentage_change, btc_dominance_yesterday, defi_24h_percentage_change,
         defi_market_cap, defi_volume_24h, defi_volume_24h_reported, derivatives_24h_percentage_change,
