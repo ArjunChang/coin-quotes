@@ -6,12 +6,7 @@ import helpers
 import sentry_sdk
 from requests.exceptions import RequestException
 from setup import setup
-
-# Initiating sentry
-sentry_sdk.init(
-    dsn="https://045d2c17a4984779ae2cb6bf045cf625@o4504849798397952.ingest.sentry.io/4504871620116480",
-    traces_sample_rate=1.0
-)
+from os import getenv
 
 
 def run_task():
@@ -33,5 +28,13 @@ def run_task():
 
 
 if __name__ == "__main__":
+    # Initiating sentry
+    sentry_sdk.init(
+        dsn=getenv("SENTRY_DSN"),
+        traces_sample_rate=1.0
+    )
+
+    # Ensure database is setup
     setup()
+
     helpers.task_handler(run_task)

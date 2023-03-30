@@ -116,7 +116,19 @@ def test_insert_quotes_data_failure(mocked_response, mocked_connection, database
 
 
 @mock.patch("time.sleep")
-def test_task_handler(mocked_sleep):
+def test_task_handler_on_task_success(mocked_sleep):
+    mocked_sleep.return_value = None
+
+    def dummy_function():
+        pass
+
+    run_count = helpers.task_handler(dummy_function)
+
+    assert run_count == 1
+
+
+@mock.patch("time.sleep")
+def test_task_handler_on_task_failure(mocked_sleep):
     mocked_sleep.return_value = None
 
     def dummy_function():

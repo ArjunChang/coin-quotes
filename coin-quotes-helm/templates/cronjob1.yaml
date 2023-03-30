@@ -26,5 +26,7 @@ spec:
               value: coin123
             - name: API_KEY
               value: 9f4f9d88-3032-4457-9f7d-d4e597df7819
+            - name: SENTRY_DSN
+              value: https://045d2c17a4984779ae2cb6bf045cf625@o4504849798397952.ingest.sentry.io/4504871620116480
           imagePullPolicy: Always
           restartPolicy: OnFailure

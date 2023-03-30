@@ -24,5 +24,7 @@ spec:
               value: coinTask
             - name: POSTGRES_PASSWORD
               value: coin123
+            - name: SENTRY_DSN
+              value: https://045d2c17a4984779ae2cb6bf045cf625@o4504849798397952.ingest.sentry.io/4504871620116480
           imagePullPolicy: Always
           restartPolicy: OnFailure
