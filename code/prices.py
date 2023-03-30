@@ -1,7 +1,6 @@
 import json
 import logging
 from datetime import datetime
-from time import sleep
 
 import helpers
 import sentry_sdk
@@ -35,25 +34,4 @@ def run_task():
 
 if __name__ == "__main__":
     setup()
-
-    # Inititiate backoff time and restart count
-    RESTART_COUNT = 1
-    CURRENT_BACKOFF_TIME = 10
-
-    while RESTART_COUNT <= 3:
-        try:
-            run_task()
-
-            # Reset backoff time and exit loop
-            CURRENT_BACKOFF_TIME = 10
-            break
-
-        except RequestException as e:
-            RESTART_COUNT += 1
-            # Log the error when error is encountered thrice
-            if RESTART_COUNT == 3:
-                logging.error(e)
-
-            # Wait for a while and set backoff time
-            sleep(CURRENT_BACKOFF_TIME)
-            CURRENT_BACKOFF_TIME *= 2
+    helpers.task_handler(run_task)

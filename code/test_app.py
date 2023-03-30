@@ -113,3 +113,15 @@ def test_insert_quotes_data_failure(mocked_response, mocked_connection, database
 
     with pytest.raises(RequestException):
         run_quotes_task()
+
+
+@mock.patch("time.sleep")
+def test_task_handler(mocked_sleep):
+    mocked_sleep.return_value = None
+
+    def dummy_function():
+        raise RequestException("Dummy Exception")
+
+    restart_count = helpers.task_handler(dummy_function)
+
+    assert restart_count == 3

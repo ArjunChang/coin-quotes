@@ -1,11 +1,13 @@
 import json
 import logging
+import time
 from datetime import datetime
 from os import getenv
 
 from psycopg2 import OperationalError, connect
 from psycopg2._psycopg import connection
 from requests import Session
+from requests.exceptions import RequestException
 
 
 def get_db_connection():
@@ -141,3 +143,26 @@ def insert_quotes_data(
     )
 
     conn.commit()
+
+
+def task_handler(task):
+    # Inititiate backoff time and restart count
+    run_count = 1
+    current_backoff = 10
+
+    while run_count < 3:
+        try:
+            task()
+            break
+
+        except RequestException as e:
+            run_count += 1
+            # Log the error when error is encountered thrice
+            if run_count == 3:
+                logging.error(e)
+
+            # Wait for a while and set backoff time
+            time.sleep(current_backoff)
+            current_backoff *= 2
+
+    return run_count
